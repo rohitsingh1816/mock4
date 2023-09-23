@@ -1,24 +1,27 @@
 const express = require("express");
-
-const { connection } = require("./db");
-var cors = require("cors");
-const { BookRoute } = require("./routes/book.route");
-require("dotenv").config();
+const connection = require("./config/db");
+const { bookRouter } = require("./routes/book.routes");
+require('dotenv').config();
+const cors = require("cors");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use("/book", BookRoute);
 
 app.get("/", (req, res) => {
-  res.send("Connected");
+    res.send("Welcome to Book App");
 });
 
-app.listen(5500, async () => {
-  try {
-    await connection;
-    console.log("server listening on port 5500");
-  } catch (error) {
-    console.log("DB is Disconnected");
-  }
+app.use("/", bookRouter);
+
+const PORT = process.env.port||8080; 
+app.listen(PORT, async () => {
+    try {
+        await connection;
+        console.log("Connected to DB");
+    } catch (err) {
+        console.log(err);
+        console.log("Error to connect the database");
+    }
+    console.log(`Server listening on port ${PORT}`);
 });
